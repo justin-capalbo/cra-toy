@@ -3,7 +3,7 @@ import { useAlgoliaSearch } from "../hooks";
 import { SearchResults } from "./search-results";
 
 export const Search: React.FC = () => {
-    const { hits, loading, error, query, setQuery } = useAlgoliaSearch("reactjs");
+    const { searchState, query, setQuery } = useAlgoliaSearch("reactjs");
     const [loadingText, setLoadingText] = useState("Searching...");
     return (
         <>
@@ -16,10 +16,8 @@ export const Search: React.FC = () => {
                 }}
             />
             <SearchResults 
-                loading={loading}
+                searchState={searchState}
                 loadingText={loadingText}
-                error={error}
-                hits={hits}
             />
         </>
     )

@@ -3,27 +3,25 @@ import { Hit } from "../models";
 import { SearchHits } from "./search-hits";
 
 type SearchResultsProps = {
-    hits: Hit[];
-    loading: boolean;
+    searchState: {
+        hits: Hit[];
+        loading: boolean;
+        error?: any;
+    }
     loadingText?: string;
-    error?: any;
 };
 export const SearchResults: React.FC<SearchResultsProps> = (props) => { 
-    const { loading, loadingText, error, hits } = props;
+    const { searchState, loadingText } = props;
+    const { loading, error, hits } = searchState;
+
     if (loading) {
-        return <p>{loadingText}</p>;
+        return <p>{loadingText || "Loading..."}</p>;
     }
     if (error) {
-        <p>{"Search error :("}</p>
+        return <p>{"Search error :("}</p>;
     }
         
     return (
         <SearchHits hits={hits} />
     );
-};
-
-SearchResults.defaultProps = {
-    hits: [],
-    loading: false,
-    loadingText: "Loading...",
 };

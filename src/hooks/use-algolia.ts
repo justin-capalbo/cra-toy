@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import axios from "axios";
 import to from "../util/to";
 import { Hit } from "../models";
@@ -8,27 +8,73 @@ type HitResponse = {
     hits: Hit[];
 };
 
+type SearchState = {
+    hits: Hit[];
+    error?: any;
+    loading: boolean;
+};
+
+type SearchAction = {
+    type: "SEARCH_INIT" | "SEARCH_DONE" | "SEARCH_FAIL";
+    payload?: Hit[],
+    error?: any,
+}
+
+export const algoliaReducer = (prevState: SearchState, action: SearchAction): SearchState => {
+    console.log(action.type);
+    switch (action.type) {
+        case "SEARCH_INIT": 
+            return {
+                ...prevState,
+                loading: true,
+                error: null,
+                hits: [],
+            };
+        case "SEARCH_DONE": 
+            return {
+                ...prevState,
+                loading: false,
+                error: null,
+                hits: action.payload || [],
+            };
+        case "SEARCH_FAIL": 
+            return {
+                ...prevState,
+                loading: false,
+                error: action.error,
+            };
+        default:
+            throw new Error();
+    }
+}
+
 export const useAlgoliaSearch = (initialSearchTerm?: string) => {
     const [query, setQuery] = useState(initialSearchTerm);
-    const [hits, setHits] = useState<Hit[]>([]);
-    const [error, setError] = useState<any>();
+    const [searchState, dispatch] = useReducer(algoliaReducer, {
+        loading: false,
+        hits: [],
+    });
     const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 250)}`;
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchHits = async () => {
-            setLoading(true);
+            dispatch({ type: "SEARCH_INIT" });
             const { result, error } = await to(axios.get<HitResponse>(fetchUrl));
             if (error) {
-                setError(error);
+                dispatch({ 
+                    type: "SEARCH_FAIL", 
+                    error 
+                });
             }
             if (result) {
-                setHits(result.data.hits || []);
+                dispatch({ 
+                    type: "SEARCH_DONE", 
+                    payload: result.data.hits 
+                });
             }
-            setLoading(false);
         };
         fetchHits();
     }, [fetchUrl]);
 
-    return { hits, loading, error, query, setQuery };
+    return { searchState, query, setQuery };
 };
