@@ -1,41 +1,9 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import "./App.css";
-import { useDebounce } from "./hooks";
-import to from "./util/to";
-import { Z_STREAM_ERROR } from "zlib";
-
-type HitResponse = {
-    hits: Hit[];
-};
-
-type Hit = {
-    objectID: string;
-    url: string;
-    title: string;
-}
+import { useAlgoliaSearch } from "./hooks/algolia";
 
 const App: React.FC = () => {
-    const [query, setQuery] = useState("redux");
-    const [hits, setHits] = useState<Hit[]>([]);
-    const [error, setError] = useState<any>();
-    const fetchUrl = `http://hn.algolia.com/api/v1search?query=${useDebounce(query, 500)}`;
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        const fetchHits = async () => {
-            setLoading(true);
-            const { result, error } = await to(axios.get<HitResponse>(fetchUrl));
-            if (error) {
-                setError(error);
-            }
-            if (result) {
-                setHits(result.data.hits || []);
-            }
-            setLoading(false);
-        };
-        fetchHits();
-    }, [fetchUrl]);
+    const { hits, loading, error, query, setQuery } = useAlgoliaSearch("reactjs");
 
     return (
         <>
