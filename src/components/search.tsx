@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useAlgoliaSearch } from "../hooks/algolia";
-import { SearchHits } from "./search-hits";
+import { useAlgoliaSearch } from "../hooks";
+import { SearchResults } from "./search-results";
 
 export const Search: React.FC = () => {
     const { hits, loading, error, query, setQuery } = useAlgoliaSearch("reactjs");
@@ -15,13 +15,12 @@ export const Search: React.FC = () => {
                     setQuery(e.target.value)
                 }}
             />
-            {loading ? (
-                <p>{loadingText}</p>
-            ) : error ? (
-                <p>{"Search error :("}</p>
-            ) : (
-                <SearchHits hits={hits} />
-            )}
+            <SearchResults 
+                loading={loading}
+                loadingText={loadingText}
+                error={error}
+                hits={hits}
+            />
         </>
     )
 };

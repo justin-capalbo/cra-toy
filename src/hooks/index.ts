@@ -1,1 +1,2 @@
-export * from "./debounce";
+export * from "./use-debounce";
+export * from "./use-algolia";

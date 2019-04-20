@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import to from "../util/to";
 import { Hit } from "../models";
-import { useDebounce } from "./debounce";
+import { useDebounce } from ".";
 
 type HitResponse = {
     hits: Hit[];
@@ -13,7 +13,6 @@ export const useAlgoliaSearch = (initialSearchTerm?: string) => {
     const [hits, setHits] = useState<Hit[]>([]);
     const [error, setError] = useState<any>();
     const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 500)}`;
-
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
