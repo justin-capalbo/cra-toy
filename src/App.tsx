@@ -1,29 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { useAlgoliaSearch } from "./hooks/algolia";
+import { SearchHits } from "./components/search-hits";
 
 const App: React.FC = () => {
     const { hits, loading, error, query, setQuery } = useAlgoliaSearch("reactjs");
-
+    const [loadingText, setLoadingText] = useState("Searching...");
     return (
         <>
             <input
                 type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                    setLoadingText("Updating results...");
+                    setQuery(e.target.value)
+                }}
             />
             {loading ? (
-                <p>Updating results...</p>
+                <p>{loadingText}</p>
             ) : error ? (
                 <p>{"Search error :("}</p>
             ) : (
-                <ul>
-                    {hits.map(hit => (
-                        <li key={hit.objectID}>
-                            <a href={hit.url}>{hit.title}</a>
-                        </li>
-                    ))}
-                </ul>
+                <SearchHits hits={hits} />
             )}
         </>
     );
