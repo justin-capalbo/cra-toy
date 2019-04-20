@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 // useDebounce - https://dev.to/gabe_ragland/debouncing-with-react-hooks-jci
 // Our hook
-export const useDebounce = (value: any, delay: number)  => {
+export const useDebounce = (value: any, delay: number = 500)  => {
     // State and setters for debounced value
     const [debouncedValue, setDebouncedValue] = useState(value);
 

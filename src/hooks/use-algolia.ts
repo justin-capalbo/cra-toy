@@ -12,7 +12,7 @@ export const useAlgoliaSearch = (initialSearchTerm?: string) => {
     const [query, setQuery] = useState(initialSearchTerm);
     const [hits, setHits] = useState<Hit[]>([]);
     const [error, setError] = useState<any>();
-    const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 500)}`;
+    const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 250)}`;
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
