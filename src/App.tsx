@@ -13,21 +13,22 @@ type Hit = {
     title: string;
 }
 
-
 const App: React.FC = () => {
     const [query, setQuery] = useState("redux");
     const [data, setData] = useState<HitResponse>({ hits: [] });
-    const debouncedQuery = useDebounce(query, 500);
+    const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 500)}`;
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${debouncedQuery}`;
         const fetchHits = async () => { 
-            const result = await axios.get<HitResponse>(fetchUrl);
-            setData(result.data);
+            setLoading(true);
+            const { data } = await axios.get<HitResponse>(fetchUrl);
+            setData(data);
+            setLoading(false);
         };
         
         fetchHits();
-    }, [debouncedQuery]);
+    }, [fetchUrl]);
 
     return (
         <>
@@ -36,13 +37,17 @@ const App: React.FC = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
             />
-            <ul>
-                {data.hits.map(item => (
-                    <li key={item.objectID}>
-                        <a href={item.url}>{item.title}</a>
-                    </li>
-                ))}
-            </ul>
+            {loading ? (
+                <div>Updating results...</div>
+            ) : (
+                <ul>
+                    {data.hits.map(item => (
+                        <li key={item.objectID}>
+                            <a href={item.url}>{item.title}</a>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </>
     );
 };
