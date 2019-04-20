@@ -10,7 +10,7 @@ type HitResponse = {
 
 type SearchState = {
     hits: Hit[];
-    error?: any;
+    error: any;
     loading: boolean;
 };
 
@@ -48,11 +48,12 @@ export const algoliaReducer = (prevState: SearchState, action: SearchAction): Se
     }
 }
 
-export const useAlgoliaSearch = (initialSearchTerm?: string) => {
+export const useAlgoliaSearch = (initialSearchTerm: string = "") => {
     const [query, setQuery] = useState(initialSearchTerm);
     const [searchState, dispatch] = useReducer(algoliaReducer, {
-        loading: false,
         hits: [],
+        loading: false,
+        error: null,
     });
     const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 500)}`;
 
