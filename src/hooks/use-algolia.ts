@@ -23,21 +23,21 @@ type SearchAction = {
 export const algoliaReducer = (prevState: SearchState, action: SearchAction): SearchState => {
     console.log(action.type);
     switch (action.type) {
-        case "SEARCH_INIT": 
+        case "SEARCH_INIT":
             return {
                 ...prevState,
                 loading: true,
                 error: null,
                 hits: [],
             };
-        case "SEARCH_DONE": 
+        case "SEARCH_DONE":
             return {
                 ...prevState,
                 loading: false,
                 error: null,
                 hits: action.payload || [],
             };
-        case "SEARCH_FAIL": 
+        case "SEARCH_FAIL":
             return {
                 ...prevState,
                 loading: false,
@@ -54,27 +54,35 @@ export const useAlgoliaSearch = (initialSearchTerm?: string) => {
         loading: false,
         hits: [],
     });
-    const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 250)}`;
+    const fetchUrl = `http://hn.algolia.com/api/v1/search?query=${useDebounce(query, 500)}`;
 
     useEffect(() => {
+        let didCancel = false;
         const fetchHits = async () => {
             dispatch({ type: "SEARCH_INIT" });
             const { result, error } = await to(axios.get<HitResponse>(fetchUrl));
-            if (error) {
-                dispatch({ 
-                    type: "SEARCH_FAIL", 
-                    error 
-                });
-            }
-            if (result) {
-                dispatch({ 
-                    type: "SEARCH_DONE", 
-                    payload: result.data.hits 
-                });
+            if (!didCancel) {
+                if (error) {
+                    dispatch({
+                        type: "SEARCH_FAIL",
+                        error
+                    });
+                }
+                if (result) {
+                    dispatch({
+                        type: "SEARCH_DONE",
+                        payload: result.data.hits
+                    });
+                }
             }
         };
         fetchHits();
-    }, [fetchUrl]);
+
+        //Cleanup
+        return () => {
+            didCancel = true;
+        };
+    }, [fetchUrl]); //Dependencies
 
     return { searchState, query, setQuery };
 };
