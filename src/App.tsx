@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
 
-type Item = {
+type HitResponse = {
+    hits: Hit[];
+};
+
+type Hit = {
     objectID: string;
     url: string;
     title: string;
 }
 
+const fetchUrl = "http://hn.algolia.com/api/v1/search?query=redux";
+
 const App: React.FC = () => {
-    const [data, setData] = useState<{ hits: Item[] }>({ hits: [{ objectID: "test", url: "https://google.com", title: "test item" }] });
+    const [data, setData] = useState<HitResponse>({ hits: [] });
+
+    useEffect(() => {
+        const fetchHits = async () => { 
+            const result = await axios.get<HitResponse>(fetchUrl);
+            setData(result.data);
+        };
+        
+        fetchHits();
+    }, []);
 
     return (
         <ul>
